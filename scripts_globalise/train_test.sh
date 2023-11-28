@@ -12,7 +12,7 @@ NAME=$2
 fairseq-train $DATASET/bin/ \
     --save-dir models/$NAME \
     --tensorboard-logdir tensorboard_logs/$NAME \
-    --restore-file models/bart.large/model.pt \
+    --restore-file models/fairseq_multilingual_entity_disambiguation/model.pt \
     --arch bart_large  \
     --task translation  \
     --criterion label_smoothed_cross_entropy  \
@@ -20,9 +20,9 @@ fairseq-train $DATASET/bin/ \
     --target-lang target  \
     --truncate-source  \
     --label-smoothing 0.1  \
-    --max-tokens 1024  \
+    --max-tokens 128  \
     --update-freq 1  \
-    --max-update 200000  \
+    --max-update 20  \
     --required-batch-size-multiple 1  \
     --dropout 0.1  \
     --attention-dropout 0.1  \
@@ -34,10 +34,10 @@ fairseq-train $DATASET/bin/ \
     --clip-norm 0.1  \
     --lr-scheduler polynomial_decay  \
     --lr 3e-05  \
-    --total-num-update 200000  \
-    --warmup-updates 500  \
+    --total-num-update 20  \
+    --warmup-updates 5  \
     --ddp-backend no_c10d  \
-    --num-workers 20  \
+    --num-workers 10  \
     --reset-meters  \
     --reset-optimizer \
     --share-all-embeddings \
@@ -46,6 +46,6 @@ fairseq-train $DATASET/bin/ \
     --skip-invalid-size-inputs-valid-test  \
     --log-format json  \
     --log-interval 10  \
-    --patience 200 \
+    --patience 2 \
     --encoder-normalize-before \
     --decoder-normalize-before

@@ -15,7 +15,7 @@ echo "Processing ${DATASET}"
 
 for SPLIT in train dev; do
     for LANG in "source" "target"; do
-        python scripts/preprocess_sentencepiece.py --m ${MODEL} \
+        python preprocess_sentencepiece.py --m ${MODEL} \
         --inputs ${DATASET}/${SPLIT}.${LANG} \
         --outputs ${DATASET}/${SPLIT}.spm.${LANG} \
         --workers 40
@@ -30,6 +30,7 @@ fairseq-preprocess \
   --destdir ${DATASET}/bin \
   --thresholdtgt 0 \
   --thresholdsrc 0 \
-  --srcdict ${DICT} \
-  --tgtdict ${DICT} \
-  --workers 40
+  --workers 4 \
+  --srcdict ${DICT}/dict.source.txt \
+  --tgtdict ${DICT}/dict.target.txt \
+  ##--joined-dictionary \

@@ -1,15 +1,17 @@
 import argparse
-import json
 import logging
 import os
 import pickle
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-import jsonlines
-from mgenre.base_model import mGENRE
-from mgenre.utils import add_to_trie, chunk_it, extract_pages
+from genre.fairseq_model import mGENRE
+from genre.utils import chunk_it, extract_pages
+from genre.trie import Trie
 from tqdm.auto import tqdm, trange
+
+def add_to_trie(seq, dct):
+    Trie._add_to_trie(seq, trie_dict=dct)
 
 if __name__ == "__main__":
 

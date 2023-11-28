@@ -5,6 +5,7 @@ src
 predictions
 models 
 notebooks
+fairseq
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
