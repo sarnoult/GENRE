@@ -1,16 +1,50 @@
+import argparse
 import pickle
 import sys
 from genre.trie import Trie, MarisaTrie
 
 from genre.fairseq_model import mGENRE
 
-def main(pkl_trie, test_sentences, targets_out):
-    with open(pkl_trie, "rb") as f:
+def main():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "targets_trie",
+        type=str,
+        help="targets trie for constrained search"
+    )
+    parser.add_argument(
+        "source",
+        help="source file (text file)",
+        type=str,
+    )
+    parser.add_argument(
+        "targets",
+        help="target predictions (pkl file)",
+        type=str,
+    )
+    parser.add_argument(
+        "-n",
+        "--beam_size",
+        type=int,
+        help="beam search size / number of predictions",
+        default=10
+    )
+    parser.add_argument(
+        "-m",
+        "--model_dir",
+        help="Pretrained model directory",
+        type=str,
+        default="models/fairseq_multilingual_entity_disambiguation"
+    )
+    args = parser.parse_args()
+    
+    with open(args.targets_trie, "rb") as f:
         trie = Trie.load_from_dict(pickle.load(f))
 
-    model = mGENRE.from_pretrained("models/fairseq_multilingual_entity_disambiguation").eval()
+    model = mGENRE.from_pretrained(args.model_dir).eval()
 
-    with open(test_sentences) as f:
+    with open(args.source) as f:
         sentences = list(map(lambda x: x.strip(), f.readlines()))
 
     output = model.sample(
@@ -19,12 +53,10 @@ def main(pkl_trie, test_sentences, targets_out):
             e for e in trie.get(sent.tolist())
             if e < len(model.task.target_dictionary)
         ],
+        beam=args.beam_size
     )
-    with open(targets_out_pkl, "rb") as f:
+    with open(args.targets, "wb") as f:
         pickle.dump(output, f)
 
 if __name__ == '__main__':
-    targets_pkl = sys.argv[1]   
-    test_file = sys.argv[2]
-    targets_out_pkl = sys.argv[3]
-    main(targets_pkl, test_file, targets_out_pkl)
+    main()
