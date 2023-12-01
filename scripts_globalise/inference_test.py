@@ -4,7 +4,7 @@ from genre.trie import Trie, MarisaTrie
 
 from genre.fairseq_model import mGENRE
 
-def main(pkl_trie, test_sentences):
+def main(pkl_trie, test_sentences, targets_out):
     with open(pkl_trie, "rb") as f:
         trie = Trie.load_from_dict(pickle.load(f))
 
@@ -18,13 +18,13 @@ def main(pkl_trie, test_sentences):
         prefix_allowed_tokens_fn=lambda batch_id, sent: [
             e for e in trie.get(sent.tolist())
             if e < len(model.task.target_dictionary)
-            # for huggingface/transformers
-            # if e < len(model2.tokenizer) - 1
         ],
     )
-    print(output)
+    with open(targets_out_pkl, "rb") as f:
+        pickle.dump(output, f)
 
 if __name__ == '__main__':
-    targets_pkl = sys.argv[1]   # "../data/training/lang_title_globalise.pkl"
+    targets_pkl = sys.argv[1]   
     test_file = sys.argv[2]
-    main(targets_pkl, test_file)
+    targets_out_pkl = sys.argv[3]
+    main(targets_pkl, test_file, targets_out_pkl)
