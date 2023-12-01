@@ -1,7 +1,9 @@
 import argparse
+from collections import defaultdict
 import logging
 import os
 import pickle
+
 
 from genre.fairseq_model import mGENRE
 from genre.utils import chunk_it, extract_pages
@@ -71,10 +73,23 @@ if __name__ == "__main__":
 
     with open(args.kb_titles) as f:
         titles = f.readlines()
-    lang_titles2bpes = {
-        ("nl", title): mgenre.encode(title).tolist() 
+    titles2bpes = {
+        title.strip(): mgenre.encode(title.strip()).tolist() 
             for title in titles
     }
-    with open(os.path.join(args.output_dir, "lang_title_globalise.pkl"), "wb") as f:
-        pickle.dump(lang_titles2bpes, f)
+    titles_bpes = defaultdict(dict)
+    for title, bpes in tqdm(titles2bpes.items()):
+        titles_bpes[title] = [2] + bpes[1:] 
+    #print(mgenre.encode(titles2bpes[titles[0].strip()]).tolist())
+    # with open(os.path.join(args.output_dir, "lang_title_globalise.pkl"), "wb") as f:
+    #     pickle.dump(lang_titles2bpes, f)
+
+    trie = {}
+    for sequence in tqdm(titles_bpes.values()):
+        add_to_trie(sequence, trie)
+
+    logging.info("Saving {}".format(os.path.join(args.output_dir, "globalise_titles_trie.pkl")))
+    with open(os.path.join(args.output_dir, "globalise_titles_trie.pkl"), "wb") as f:
+        pickle.dump(trie, f)
+
     

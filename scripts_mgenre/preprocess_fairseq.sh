@@ -33,4 +33,3 @@ fairseq-preprocess \
   --workers 4 \
   --srcdict ${DICT}/dict.source.txt \
   --tgtdict ${DICT}/dict.target.txt \
-  ##--joined-dictionary \
